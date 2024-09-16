@@ -1,0 +1,2 @@
+"""Test Bazel python
+"""
