@@ -1,3 +1,11 @@
 .venv
-__pycache__
+**/__pycache__/
 *.pyc
+
+# Bazel directories
+/bazel-*
+/bazel-bin
+/bazel-genfiles
+/bazel-out
+/bazel-testlogs
+user.bazelrc
