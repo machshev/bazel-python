@@ -1,0 +1,45 @@
+package(default_visibility = ["//visibility:public"])
+
+
+# Load the dependencies from pyproject.toml
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+compile_pip_requirements(
+    name = "deps",
+    srcs = [":pyproject.toml"],
+    requirements_txt="requirements.txt",
+    generate_hashes=False, # pin at the top-level
+)
+
+
+# Create a python library from this dir
+load("@rules_python//python:defs.bzl", "py_library")
+load("@pypi//:requirements.bzl", "requirement")
+
+py_library(
+    name = "lib",
+    srcs = glob(["**/*.py"]),
+    data = glob(["**/*"], exclude=[
+        # These entries include those put into user-installed dependencies by
+        # data_exclude to avoid non-determinism.
+        "**/*.py",
+        "**/*.pyc",
+        "**/*.pyc.*",  # During pyc creation, temp files named *.pyc.NNN are created
+        "**/* *",
+        "**/*.dist-info/RECORD",
+        "BUILD",
+        "WORKSPACE",
+    ]),
+    # This makes this directory a top-level in the python import
+    # search path for anything that depends on this.
+    imports = ["."],
+    deps=[requirement("click")],
+)
+
+load("@rules_python//python:packaging.bzl", "py_package")
+
+py_package(
+    name="pkg",
+    deps=[":lib"],
+)
+
