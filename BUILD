@@ -5,20 +5,27 @@ exports_files([
     "python-requirements.txt",
 ])
 
-load("@rules_uv//uv:pip.bzl", "pip_compile")
-load("@rules_uv//uv:venv.bzl", "create_venv")
-#load("@rules_python//python:pip.bzl", pip_compile="compile_pip_requirements")
+load("@rules_python//python:pip.bzl", pip_compile="compile_pip_requirements")
 
 pip_compile(
     name = "generate_requirements_txt",
     requirements_in = "//:requirements.in", # default
     requirements_txt = "//:requirements.txt", # default
-    data=["//pythontest:lib"],
+    data = ["//pythontest:lib"],
 )
 
-create_venv(
-    name = "create_venv",
-    requirements_txt = "//:requirements.txt", # default
-    data=["//pythontest:lib"],
-)
 
+load("@pypi//:requirements.bzl", "install_deps")
+
+install_deps()
+
+
+load("@pypi//:requirements.bzl", "entry_point")
+
+alias(
+    name = "bp",
+    actual = entry_point(
+        pkg = "bp",
+        script = "bp",
+    ),
+)

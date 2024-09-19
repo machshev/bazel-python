@@ -18,5 +18,11 @@ python.toolchain(
     python_version = "3.11",
 )
 
-# Use uv to lock the python dependeciy versions to requirements.txt
-bazel_dep(name = "rules_uv", version = "0.29.0")
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+
+pip.parse(
+    name = "pypi",
+    requirements_lock = "//:requirements.txt",
+)
+use_repo(pip, "pypi")
+
